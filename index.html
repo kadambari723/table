@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sortable & Filterable Table</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        th { cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">User Registration</h2>
+        <form id="registrationForm" class="row g-2">
+            <div class="col-md-4">
+                <input type="text" id="name" class="form-control" placeholder="Full Name" required>
+            </div>
+            <div class="col-md-4">
+                <input type="email" id="email" class="form-control" placeholder="Email" required>
+            </div>
+            <div class="col-md-3">
+                <select id="role" class="form-select" required>
+                    <option value="">Select Role</option>
+                    <option value="Admin">Admin</option>
+                    <option value="User">User</option>
+                    <option value="Guest">Guest</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-primary w-100" onclick="addUser()">+</button>
+            </div>
+        </form>
+
+        <h2 class="text-center mt-4">User List</h2>
+        <input type="text" id="search" class="form-control mb-2" placeholder="Search by name..." onkeyup="filterTable()">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th onclick="sortTable(0)">Name</th>
+                    <th onclick="sortTable(1)">Email</th>
+                    <th>
+                        <select id="filterRole" class="form-select" onchange="filterTable()">
+                            <option value="">All Roles</option>
+                            <option value="Admin">Admin</option>
+                            <option value="User">User</option>
+                            <option value="Guest">Guest</option>
+                        </select>
+                    </th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="userTable"></tbody>
+        </table>
+    </div>
+
+    <script>
+        function addUser() {
+            let name = document.getElementById("name").value;
+            let email = document.getElementById("email").value;
+            let role = document.getElementById("role").value;
+            let table = document.getElementById("userTable");
+
+            if (!name || !email || !role) {
+                alert("Please fill all fields");
+                return;
+            }
+
+            let row = table.insertRow();
+            row.innerHTML = `<td>${name}</td><td>${email}</td><td>${role}</td><td><button class='btn btn-danger btn-sm' onclick='deleteRow(this)'>Delete</button></td>`;
+            document.getElementById("registrationForm").reset();
+        }
+
+        function deleteRow(button) {
+            button.parentElement.parentElement.remove();
+        }
+
+        function sortTable(columnIndex) {
+            let table = document.getElementById("userTable");
+            let rows = Array.from(table.rows);
+            rows.sort((a, b) => a.cells[columnIndex].innerText.localeCompare(b.cells[columnIndex].innerText));
+            table.innerHTML = "";
+            rows.forEach(row => table.appendChild(row));
+        }
+
+        function filterTable() {
+            let search = document.getElementById("search").value.toLowerCase();
+            let filterRole = document.getElementById("filterRole").value;
+            let rows = document.getElementById("userTable").getElementsByTagName("tr");
+            
+            for (let row of rows) {
+                let name = row.cells[0].innerText.toLowerCase();
+                let role = row.cells[2].innerText;
+                row.style.display = (name.includes(search) && (!filterRole || role === filterRole)) ? "" : "none";
+            }
+        }
+    </script>
+</body>
+</html>
